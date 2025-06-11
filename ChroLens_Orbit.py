@@ -6,7 +6,7 @@
 # row 5: 已建立排程清單
 # row 6: 保留的排程 標題 + 復原按鈕
 # row 7: 保留的排程清單
-
+#pyinstaller --noconsole --onedir --icon=讀者貓貓.ico --add-data "讀者貓貓.ico;." ChroLens_Orbit.py
 import tkinter as tk
 import ttkbootstrap as tb
 from ttkbootstrap import Style
@@ -32,6 +32,17 @@ class SchedulerApp:
         self.saved_schedules = []
 
         self.style = Style("darkly")
+
+        # 設定主視窗 icon
+        try:
+            import sys, os
+            if getattr(sys, 'frozen', False):
+                icon_path = os.path.join(sys._MEIPASS, "讀者貓貓.ico")
+            else:
+                icon_path = "讀者貓貓.ico"
+            self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"無法設定主視窗 icon: {e}")
 
         # 主框架
         self.main_frame = ttk.Frame(self.root, padding=10)
@@ -314,7 +325,7 @@ class SchedulerApp:
 
     def show_about_dialog(self):
         about_win = tb.Toplevel(self.root)
-        about_win.title("關於 ChroLens_Mimic")
+        about_win.title("關於 ChroLens_Orbit")
         about_win.geometry("450x300")
         about_win.resizable(False, False)
         about_win.grab_set()
@@ -328,9 +339,9 @@ class SchedulerApp:
         try:
             import sys, os
             if getattr(sys, 'frozen', False):
-                icon_path = os.path.join(sys._MEIPASS, "觸手眼鏡貓.ico")
+                icon_path = os.path.join(sys._MEIPASS, "讀者貓貓.ico")
             else:
-                icon_path = "觸手眼鏡貓.ico"
+                icon_path = "讀者貓貓.ico"
             about_win.iconbitmap(icon_path)
         except Exception as e:
             print(f"無法設定 about 視窗 icon: {e}")
@@ -346,8 +357,17 @@ class SchedulerApp:
         github.pack(anchor="w", pady=(8, 0))
         github.bind("<Button-1>", lambda e: os.startfile("https://home.gamer.com.tw/profile/index_creation.php?owner=umiwued&folder=523848"))
         tb.Label(frm, text="Creat By Lucienwooo", font=("Microsoft JhengHei", 11,)).pack(anchor="w", pady=(0, 6))
-        tb.Button(frm, text="關閉", command=about_win.destroy, width=8, bootstyle=tb.SECONDARY).pack(anchor="e", pady=(16, 0))
 
+        # 新增按鈕：開啟Windows工作排程
+        def open_task_scheduler():
+            try:
+                os.system("start taskschd.msc")
+            except Exception as ex:
+                Messagebox.show_error(f"無法開啟工作排程器: {ex}")
+
+        tb.Button(frm, text="開啟Windows工作排程", command=open_task_scheduler, width=22, bootstyle=tb.INFO).pack(anchor="e", pady=(8, 0))
+        tb.Button(frm, text="關閉", command=about_win.destroy, width=8, bootstyle=tb.SECONDARY).pack(anchor="e", pady=(16, 0))
+        
 if __name__ == "__main__":
     root = tk.Tk()
     app = SchedulerApp(root)
